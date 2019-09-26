@@ -20,6 +20,15 @@ namespace TodoApi.Controllers
             _context = context;
         }
 
+        // /api/TodoItems/Image
+        [Route("Image")]
+        [HttpGet]
+        public IActionResult Image()
+        {
+            Byte[] b = System.IO.File.ReadAllBytes(@"C:\\test.jpg");   // You can use your own method over here.         
+            return File(b, "image/jpeg");
+        }
+
         // GET: api/TodoItems
         [HttpGet]
         public async Task<ActionResult<IEnumerable<TodoItem>>> GetTodoItems()
