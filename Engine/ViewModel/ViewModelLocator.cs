@@ -14,6 +14,7 @@
 
 using CommonServiceLocator;
 using GalaSoft.MvvmLight.Ioc;
+using Engine.Interfaces;
 
 namespace Engine.ViewModel
 {
@@ -29,6 +30,7 @@ namespace Engine.ViewModel
         public ViewModelLocator()
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
+            SimpleIoc.Default.Register<IMessageProducer, MessageProducer>();
 
             ////if (ViewModelBase.IsInDesignModeStatic)
             ////{

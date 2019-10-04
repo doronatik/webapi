@@ -1,22 +1,12 @@
 ﻿using System;
 using RabbitMQ.Client;
 using System.Text;
+using Engine.Interfaces;
 
-namespace Engine.MessageProducer
+namespace Engine
 {
-    public sealed class Sender
+    public sealed class MessageProducer : IMessageProducer
     {
-        private static readonly Lazy<Sender>
-            lazy =
-            new Lazy<Sender>
-                (() => new Sender());
-
-        public static Sender Instance { get { return lazy.Value; } }
-
-        private Sender()
-        {
-        }
-
         public void Send()
         {
             var factory = new ConnectionFactory() { HostName = "localhost" };

@@ -1,5 +1,5 @@
 using System;
-using Engine.MessageProducer;
+using Engine.Interfaces;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 
@@ -35,21 +35,51 @@ namespace Engine.ViewModel
                 {
                     _message = value;
                     RaisePropertyChanged(nameof(Message));
+                    SendCommand.RaiseCanExecuteChanged();
                 }
             }
         }
+
+        private string _text = string.Empty;
+        public string Text
+        {
+            get
+            {
+                return _text;
+            }
+            set
+            {
+                if (!_text.Equals(value))
+                {
+                    _text = value;
+                    RaisePropertyChanged(nameof(Text));
+                    SendCommand.RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+        private readonly IMessageProducer _messageProducer;
+
         /// <summary>
         /// Initializes a new instance of the MainViewModel class.
         /// </summary>
-        public MainViewModel()
+        public MainViewModel(IMessageProducer messageProducer)
         {
-            SendCommand = new RelayCommand(DoSendCommand);
+            _messageProducer = messageProducer;
+            SendCommand = new RelayCommand(DoSendCommand, CanDoSendCommand);
             Message = "Hello world!";
+            Text = string.Empty;
         }
 
         private void DoSendCommand()
         {
-            Sender.Instance.Send();
+            //MessageProducer.Instance.Send();
+            _messageProducer.Send();
+        }
+
+        private bool CanDoSendCommand()
+        {
+            return Text.Equals("1");
         }
     }
 }

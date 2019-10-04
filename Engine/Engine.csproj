@@ -73,7 +73,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="MessageProducer\Send.cs" />
+    <Compile Include="Interfaces\IMessageProducer.cs" />
+    <Compile Include="MessageProducer\MessageProducer.cs" />
     <Compile Include="ViewModel\MainViewModel.cs" />
     <Compile Include="ViewModel\ViewModelLocator.cs" />
     <Page Include="MainWindow.xaml">
