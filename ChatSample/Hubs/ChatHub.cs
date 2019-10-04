@@ -11,9 +11,11 @@ namespace ChatSample.Hubs
             Clients.All.SendAsync("broadcastMessage", name, message);
         }
 
-        public override Task OnConnectedAsync()
+        public override async Task OnConnectedAsync()
         {
-            return base.OnConnectedAsync();
+
+            await Clients.All.SendAsync("broadcastMessage", "SYSTEM", $"{Context.UserIdentifier} joined.");
+            await base.OnConnectedAsync();
 
         }
     }
