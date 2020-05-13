@@ -1,40 +1,60 @@
-﻿using System;
-using Microsoft.AspNet.SignalR;
+﻿using Microsoft.AspNet.SignalR;
+using Microsoft.AspNet.SignalR.Hubs;
+using Microsoft.Owin;
+using Microsoft.Owin.Cors;
 using Microsoft.Owin.Hosting;
 using Owin;
-using Microsoft.Owin.Cors;
+using System;
 
+[assembly: OwinStartup(typeof(SignalRSelfHost.Program.Startup))]
 namespace SignalRSelfHost
 {
     class Program
     {
+        static IDisposable SignalR;
+
         static void Main(string[] args)
         {
-            // This will *ONLY* bind to localhost, if you want to bind to all addresses
-            // use http://*:8080 to bind to all addresses. 
-            // See http://msdn.microsoft.com/library/system.net.httplistener.aspx 
-            // for more information.
-            string url = "http://localhost:8080";
-            using (WebApp.Start(url))
+            string url = "http://127.0.0.1:8088";
+            SignalR = WebApp.Start(url);
+
+            Console.ReadKey();
+        }
+
+        public class Startup
+        {
+            public void Configuration(IAppBuilder app)
             {
-                Console.WriteLine("Server running on {0}", url);
-                Console.ReadLine();
+                app.UseCors(CorsOptions.AllowAll);
+
+                /*  CAMEL CASE & JSON DATE FORMATTING
+                 use SignalRContractResolver from
+                https://stackoverflow.com/questions/30005575/signalr-use-camel-case
+
+                var settings = new JsonSerializerSettings()
+                {
+                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                    DateTimeZoneHandling = DateTimeZoneHandling.Utc
+                };
+
+                settings.ContractResolver = new SignalRContractResolver();
+                var serializer = JsonSerializer.Create(settings);
+
+               GlobalHost.DependencyResolver.Register(typeof(JsonSerializer),  () => serializer);                
+
+                 */
+
+                app.MapSignalR();
             }
         }
-    }
-    class Startup
-    {
-        public void Configuration(IAppBuilder app)
+
+        [HubName("MyHub")]
+        public class MyHub : Hub
         {
-            app.UseCors(CorsOptions.AllowAll);
-            app.MapSignalR();
-        }
-    }
-    public class MyHub : Hub
-    {
-        public void Send(string name, string message)
-        {
-            Clients.All.addMessage(name, message);
+            public void Send(string name, string message)
+            {
+                Clients.All.addMessage(name, message);
+            }
         }
     }
 }
