@@ -7,7 +7,7 @@ using Owin;
 using System;
 using System.Threading.Tasks;
 
-[assembly: OwinStartup(typeof(SignalRSelfHost.Program.Startup))]
+//[assembly: OwinStartup(typeof(SignalRSelfHost.Program.Startup))]
 namespace SignalRSelfHost
 {
     class Program
@@ -17,7 +17,8 @@ namespace SignalRSelfHost
         static void Main(string[] args)
         {
             string url = "http://*:8088";
-            SignalR = WebApp.Start(url);
+            //SignalR = WebApp.Start(url);
+            SignalR = WebApp.Start<Startup>(url);
 
             Console.ReadKey();
         }
@@ -26,27 +27,21 @@ namespace SignalRSelfHost
         {
             public void Configuration(IAppBuilder app)
             {
-                app.UseCors(CorsOptions.AllowAll);
-
-                /*  CAMEL CASE & JSON DATE FORMATTING
-                 use SignalRContractResolver from
-                https://stackoverflow.com/questions/30005575/signalr-use-camel-case
-
-                var settings = new JsonSerializerSettings()
+                app.Map("/signalr", map =>
                 {
-                    DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                    DateTimeZoneHandling = DateTimeZoneHandling.Utc
-                };
+                    map.UseCors(CorsOptions.AllowAll);
+                    var hubConfiguration = new HubConfiguration
+                    {
+                        EnableDetailedErrors = true,
+                        EnableJSONP = true
+                    };
 
-                settings.ContractResolver = new SignalRContractResolver();
-                var serializer = JsonSerializer.Create(settings);
-
-               GlobalHost.DependencyResolver.Register(typeof(JsonSerializer),  () => serializer);                
-
-                 */
-
-                app.MapSignalR();
+                    map.RunSignalR(hubConfiguration);
+                });
             }
+
+            //app.UseCors(CorsOptions.AllowAll);
+            //app.MapSignalR();
         }
 
         [HubName("MyHub")]
