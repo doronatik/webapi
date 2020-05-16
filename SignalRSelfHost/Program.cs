@@ -5,6 +5,7 @@ using Microsoft.Owin.Cors;
 using Microsoft.Owin.Hosting;
 using Owin;
 using System;
+using System.Threading.Tasks;
 
 [assembly: OwinStartup(typeof(SignalRSelfHost.Program.Startup))]
 namespace SignalRSelfHost
@@ -15,7 +16,7 @@ namespace SignalRSelfHost
 
         static void Main(string[] args)
         {
-            string url = "http://127.0.0.1:8088";
+            string url = "http://*:8088";
             SignalR = WebApp.Start(url);
 
             Console.ReadKey();
@@ -51,9 +52,21 @@ namespace SignalRSelfHost
         [HubName("MyHub")]
         public class MyHub : Hub
         {
+            public override Task OnConnected()
+            {
+                Clients.Caller.identifyMessage();
+                return base.OnConnected();
+            }
+
+            public void Identify(string name)
+            {
+                Clients.All.broadcastMessage("SYSTEM", $"Welcome - {name}");
+            }
+
             public void Send(string name, string message)
             {
-                Clients.All.addMessage(name, message);
+                Console.WriteLine($"{name}: {message}");
+                Clients.All.broadcastMessage(name, message);
             }
         }
     }

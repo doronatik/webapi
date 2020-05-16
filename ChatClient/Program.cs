@@ -19,6 +19,16 @@ namespace ChatClient
             connection.Reconnecting += Connection_Reconnecting;
             connection.StateChanged += Connection_StateChanged;
 
+
+            myHub.On("identifyMessage", () =>
+            {
+                myHub.Invoke<string>("Identify", name);
+            });
+
+            myHub.On<string, string>("broadcastMessage", (s1, s2) => {
+                Console.WriteLine(s1 + ": " + s2);
+            });
+
             connection.Start().ContinueWith(task => {
                 if (task.IsFaulted)
                 {
@@ -27,10 +37,6 @@ namespace ChatClient
                 else
                 {
                     Console.WriteLine("Connected");
-
-                    myHub.On<string, string>("addMessage", (s1, s2) => {
-                        Console.WriteLine(s1 + ": " + s2);
-                    });
 
                     while (true)
                     {
